@@ -7,31 +7,6 @@ NOTION_DB_RSS = "90761665a1d141b984afca52a2b05410"
 NOTION_DB_KEYWORDS = "26d213dcc8b641cd921db43eb7b23733"
 NOTION_DB_READER = "28dfbfdf24a848cd9de28302454ee3dd"
 
-FEISHU_BOT_API = os.environ.get("FEISHU_BOT_API")
-FEISHU_BOT_SEC = os.environ.get("FEISHU_BOT_SEC")
-
-
-def feishu_bot_send_msg(msg):
-    """
-    msg = {"title": "", "content": ""}
-    """
-    if FEISHU_BOT_API:
-        requests.post(FEISHU_BOT_API, json={"pass": FEISHU_BOT_SEC, "msg": msg})
-
-
-def _wrap_rss_warning_msg_fmt(title, uri):
-    content = f"{title} 读取失败！\n\t{uri}"
-    feishu_bot_send_msg({"title": "❗ RSS Warning", "content": content})
-
-
-def _wrap_rss_new_msg_fmt(entries):
-    content = ""
-    for i, entry in enumerate(entries):
-        content += f"{i+1}. [{entry.get('title')}]({entry.get('link')}) | {entry.get('rss').get('title')}\n"
-    msg = {"title": "🔔 NEW RSS", "content": content}
-
-    feishu_bot_send_msg(msg)
-
 
 def process_entry(entry: dict, keywords: list):
     entropy = 0
@@ -61,9 +36,6 @@ def read_rss(rsslist):
         # !! 必须和 Notion RSS DB 保持一致
         entries = parse_rss(rss)
         print(f"Got {len(entries)} items from #{rss.get('title')}#")
-        if len(entries) == 0:
-            # 飞书提示
-            _wrap_rss_warning_msg_fmt(rss.get("title"), rss.get("uri"))
         for entry in entries:
             yield entry
 
@@ -85,9 +57,6 @@ def run():
                 new_entries.append(entry)
             else:
                 print(f"Entry {entry.get('title')} already exist!")
-    # 飞书提示
-    if len(new_entries) > 0:
-        _wrap_rss_new_msg_fmt(new_entries)
 
 
 if __name__ == "__main__":

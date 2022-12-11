@@ -75,7 +75,7 @@ class NotionAPI:
         self._col_id = coll
         self.HEADERS = {
             "Authorization": f"Bearer {self._sec}",
-            "Notion-Version": "2021-08-16",
+            "Notion-Version": "2022-06-28",
             "Content-Type": "application/json",
         }
         self.session = _req.Session()
